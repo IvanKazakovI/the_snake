@@ -15,14 +15,10 @@ LEFT = (-1, 0)
 RIGHT = (1, 0)
 
 KEYBOARD_MOVES = {
-    (pygame.K_UP, LEFT): UP,
-    (pygame.K_UP, RIGHT): UP,
-    (pygame.K_DOWN, LEFT): DOWN,
-    (pygame.K_DOWN, RIGHT): DOWN,
-    (pygame.K_LEFT, UP): LEFT,
-    (pygame.K_LEFT, DOWN): LEFT,
-    (pygame.K_RIGHT, UP): RIGHT,
-    (pygame.K_RIGHT, DOWN): RIGHT,
+    (pygame.K_UP, DOWN): UP,
+    (pygame.K_DOWN, UP): DOWN,
+    (pygame.K_LEFT, RIGHT): LEFT,
+    (pygame.K_RIGHT, LEFT): RIGHT,
 }
 
 BOARD_BACKGROUND_COLOR = (0, 0, 0)
@@ -30,8 +26,7 @@ BORDER_COLOR = (93, 216, 228)
 APPLE_COLOR = (255, 0, 0)
 SNAKE_COLOR = (0, 255, 0)
 
-# Скорость движения змейки:
-SPEED = 30
+SPEED = 20
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
 pygame.display.set_caption(f'Змейка. Клавиши управления:'
@@ -55,13 +50,11 @@ class GameObject:
         """Определяет как объект отрисовывается на экране"""
         raise NotImplementedError
 
-    def draw_elements(self, position, color):
+    def draw_elements(self, position, color=BORDER_COLOR):
         """Метод отрисовывающий элементы объектов"""
-        pygame.draw.rect(screen, self.body_color,
-                         (pygame.Rect(position, (GRID_SIZE, GRID_SIZE)))
-                         )
-        pygame.draw.rect(screen, color,
-                         (pygame.Rect(position, (GRID_SIZE, GRID_SIZE))), 1)
+        drawn_cell = (pygame.Rect(position, (GRID_SIZE, GRID_SIZE)))
+        pygame.draw.rect(screen, self.body_color, drawn_cell)
+        pygame.draw.rect(screen, color, drawn_cell, 1)
 
 
 class Snake(GameObject):
@@ -78,10 +71,10 @@ class Snake(GameObject):
     def draw(self):
         """Метод рисует объект на игровом поле"""
         for position in self.positions[:-1]:
-            GameObject.draw_elements(self, (position[0], position[1]),
-                                     color=BORDER_COLOR)
+            self.draw_elements((position[0], position[1]),
+                               color=BORDER_COLOR)
 
-        GameObject.draw_elements(self, self.positions[0], color=BORDER_COLOR)
+        self.draw_elements(self.positions[0], color=BORDER_COLOR)
 
         if self.last:
             last_rect = pygame.Rect(
@@ -141,8 +134,8 @@ class Apple(GameObject):
 
     def draw(self):
         """Метод отрисовывает объект на игровом поле"""
-        GameObject.draw_elements(self, (self.position[0], self.position[1]),
-                                 color=BORDER_COLOR)
+        self.draw_elements((self.position[0], self.position[1]),
+                           color=BORDER_COLOR)
 
 
 def handle_keys(game_object):
